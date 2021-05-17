@@ -1,0 +1,33 @@
+body {
+  font-family: 'Source Code Pro', monospace;
+  background-color: rgba(241, 245, 218, 0.589);
+}
+
+#users {
+  background-color: oldlace;
+  border: 2px solid black;
+  font-size: 18px;
+  padding: 10px;
+}
+
+#users ul {
+  padding: 0px 2px 5px 2px; 
+  color: rgb(206, 124, 124);
+}
+
+#users .usronline {
+  color: green;
+}
+
+#points {
+  border: 2px solid black;
+}
+
+.namelabel {
+  color: dimgray;
+  font-size: 12px;
+}
+
+#namebox {
+  width: 400px;
+}

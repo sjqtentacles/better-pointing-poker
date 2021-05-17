@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BetterPointingPoker</title>
+    <link href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js' integrity='sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=' crossorigin='anonymous'></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500&display=swap" rel="stylesheet">
+    <script src="./name.js"></script>
+  </head>
+
+  <body>
+    <div class='container'>
+      <h1>Better Pointing Poker</h1>
+<!-- 
+      <div class='row' id='namebox'>
+        <div class="input-field col s6 offset-s3">
+          <input id="last_name" type="text">
+          <label for="last_name">Enter Your Username</label>
+        </div>
+      </div> -->
+
+      <div class='row'>
+        <div id='users' class='col s3'>
+
+        </div>
+        <div id='points' class='col s8 offset-s1'>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+      let queryString = window.location.search
+      let urlParams = new URLSearchParams(queryString)
+      let ws;
+      let name = generateName()
+
+      let vote = "";
+      let usersData = [{"name": name, "vote": vote}]
+
+      function clearAllVotes() {
+        usersData.forEach(u => u.vote = "")
+        drawUsers(usersData)
+      }
+
+      function drawUsers(usersList) {
+        let usersDiv = document.getElementById('users');
+        usersDiv.innerHTML = '' // clear first, then draw.
+
+        let usersTable = document.createElement("table")
+        usersTable.setAttribute("class", "center-align")
+        usersTable.style.setProperty("background-color", "#f3f3f3")
+        usersTable.style.setProperty("border", "2px solid")
+
+        let tableHeadRow = document.createElement("tr")
+
+        let userHeader = document.createElement("th")
+        userHeader.innerText = "User"
+        userHeader.setAttribute("class", "center-align")
+
+        let voteHeader = document.createElement("th")
+        voteHeader.innerText = "Vote"
+        voteHeader.setAttribute("class", "center-align")
+
+        Array(userHeader, voteHeader).forEach(h => tableHeadRow.appendChild(h))
+        tableHeadRow.setAttribute("class", "center-align")  
+
+        usersTable.appendChild(tableHeadRow)
+
+        usersList.forEach(u => {
+          let userRow = document.createElement("tr")
+
+          let username = document.createElement("td")
+          username.innerText = u.name
+          username.style.setProperty("padding", "4px")
+          username.setAttribute("class", "center-align")  
+
+          let uservote = document.createElement("td")
+          uservote.innerText = u.vote
+          uservote.style.setProperty("padding", "4px")
+          uservote.setAttribute("class", "center-align")  
+
+          userRow.appendChild(username)
+          userRow.appendChild(uservote)
+          usersTable.appendChild(userRow)
+        })
+
+        usersDiv.appendChild(usersTable)
+      }
+
+      function setup(){
+        let pointsTable = document.getElementById('points');
+        let pt = document.createElement("table")
+        pt.style.setProperty("border", "2px solid")
+
+        let points = [
+          ['0 points', '1/2 point', '1 point', '2 points'],
+          ['3 points', '5 points', '8 points', '13 points'],
+          ['20 points', '40 points', '100 points', '?']
+        ]
+        points.forEach(row => {
+          let rowEl = document.createElement("tr")
+          row.forEach(el => {
+            let newButton = document.createElement("td")
+            newButton.setAttribute("class", "center-align")  
+            newButton.style.setProperty("border", "1px solid")
+            newButton.style.setProperty("background-color", "#f3f3f3")
+            newButton.style.setProperty("padding", "4px")
+            newButton.innerText = el
+            newButton.onclick = function() {
+              vote = el.split(" ")[0]
+              usersData = [{"name": name, "vote": vote}, {"name": "shelly", "vote": "2"}]
+              drawUsers(usersData)
+            }
+            rowEl.appendChild(newButton)
+          })
+          pt.appendChild(rowEl)
+        })
+        pointsTable.appendChild(pt)
+      }
+
+      if (urlParams.has('id')) {
+        setup()
+        drawUsers(usersData)
+        let session_id = urlParams.get('id')
+        ws = new WebSocket('wss://j85lq5or30.execute-api.us-west-2.amazonaws.com/prod')
+        ws.onmessage = function(evt) {
+          let session = evt.data
+          usersData = evt.data
+          console.log(evt)
+          drawUsers(usersData)
+        }
+        ws.onopen = function() {
+          ws.send(JSON.stringify({"action": "$connect", "session_id": session_id, "name": name}))
+          drawUsers(usersData)
+        }
+        ws.onclose = function() {
+          ws.send(JSON.stringify({"action": "$disconnect", "session_id": session_id, "name": name}))
+          drawUsers(usersData)
+        }
+      }
+
+
+
+
+    </script>
+  </body>
+</html>

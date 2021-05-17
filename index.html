@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BetterPointingPoker</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel='stylesheet' type="text/css" href='styles.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/underscore@1.12.0/underscore-min.js"></script>
+  </head>
+
+  <body>
+    <div class="container center-align">
+      <h2>Better Pointing Poker</h2>
+      <label class='namelabel'>What's your Name?</label>
+      <input name="name_field" type="text" value="" id="username" class="input-field">
+      <p id="output" hidden=True></p>
+    </div>
+    
+    <script>
+      let sess = window.location.pathname;
+      var ws;
+
+      if (sess != "/") {
+        ws.onopen = function() {
+          ws.send(JSON.stringify({'action': '$connect', 'name': myname, 'vote': myvote}))
+        }
+        ws = new WebSocket('wss://j85lq5or30.execute-api.us-west-2.amazonaws.com/prod')
+      }
+
+      let output = document.getElementById('output');
+      let name = document.getElementById('username');
+      document.getElementById('username').onkeydown = function(e){
+        if(e.keyCode == 13){
+          output.innerHTML = `<a href='http://127.0.0.1:8080/session/${name.value}'>http://127.0.0.1:8000/session/${name.value}</a>`;
+          output.hidden = false;
+        }
+      };
+    </script>
+  </body>
+</html>
